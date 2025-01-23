@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --container-bg: white;
+            --text-color: #333;
+            --border-color: #ddd;
+            --hover-color: #45a049;
+            --completed-bg: #f8f8f8;
+            --completed-text: #888;
+            --action-text: #666;
+            --action-hover: #333;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --border-color: #404040;
+            --hover-color: #45a049;
+            --completed-bg: #363636;
+            --completed-text: #aaaaaa;
+            --action-text: #888;
+            --action-hover: #ffffff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            background-color: var(--container-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: var(--text-color);
+            text-align: center;
+        }
+        .todo-form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .todo-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-right: 10px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+        }
+        .todo-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .todo-button:hover {
+            background-color: var(--hover-color);
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+        .todo-item.completed {
+            background-color: var(--completed-bg);
+        }
+        .todo-item.completed span {
+            text-decoration: line-through;
+            color: var(--completed-text);
+        }
+        .todo-actions {
+            margin-left: auto;
+        }
+        .todo-actions a {
+            margin-left: 10px;
+            text-decoration: none;
+            color: var(--action-text);
+        }
+        .todo-actions a:hover {
+            color: var(--action-hover);
+        }
+        .complete-link {
+            color: #4CAF50;
+        }
+        .delete-link {
+            color: #f44336;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .theme-toggle:hover {
+            background-color: var(--hover-color);
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
+    <div class="container">
+        <h1>Todo List</h1>
+        
+        <form class="todo-form" action="{{ url_for('add') }}" method="POST">
+            <input type="text" name="title" class="todo-input" placeholder="Add a new task..." required>
+            <button type="submit" class="todo-button">Add Task</button>
+        </form>
+
+        <ul class="todo-list">
+            {% for todo in todo_list %}
+            <li class="todo-item {% if todo.complete %}completed{% endif %}">
+                <span>{{ todo.title }}</span>
+                <div class="todo-actions">
+                    <a href="{{ url_for('complete', todo_id=todo.id) }}" class="complete-link">
+                        {% if todo.complete %}Undo{% else %}Complete{% endif %}
+                    </a>
+                    <a href="{{ url_for('delete', todo_id=todo.id) }}" class="delete-link">Delete</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                body.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+            }
+        });
+    </script>
+</body>
+</html>
